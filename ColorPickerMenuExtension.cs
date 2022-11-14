@@ -9,15 +9,11 @@ namespace FrostyColorPicker
     public class ColorPickerMenuExtension : MenuExtension
     {
         public override string TopLevelMenuName => "Tools";
-        public override string MenuItemName => "Color Picker";
+        public override string MenuItemName => "Color Menu";
         public override RelayCommand MenuItemClicked => new RelayCommand((Action<object>)delegate
         {
-            ColorPickerWindow2 colorPickerWindow = new ColorPickerWindow2();
+            ColorPickerWindow colorPickerWindow = new ColorPickerWindow();
             colorPickerWindow.Show();
-            //ColorPickerWindow colorPickerWindow = new ColorPickerWindow();
-            //colorPickerWindow.Show();
-            //ChooseColorWindow chooseColorWindow = new ChooseColorWindow();
-            //chooseColorWindow.Show();
         });
     }
 }
