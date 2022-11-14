@@ -212,11 +212,32 @@ namespace FrostyColorPicker.Windows
             }
         }
 
-        // Open the color picker.
-        private void openColorPickerButton_Click(object sender, RoutedEventArgs e)
+        private void hexadecimalTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ChooseColorWindow chooseColorWindow = new ChooseColorWindow();
-            chooseColorWindow.Show();
+            if (!hexadecimalTextBox.IsFocused)
+                return;
+
+            string hexString = hexadecimalTextBox.Text;
+
+            if (hexString.Contains("#"))
+                hexString = hexString.Replace("#", "");
+
+            if (hexString.Length < 6)
+                return;
+
+            try
+            {
+                System.Drawing.Color color = System.Drawing.Color.FromArgb(int.Parse(hexString, System.Globalization.NumberStyles.HexNumber));
+                redTextBox.Text = color.R.ToString();
+                greenTextBox.Text = color.G.ToString();
+                blueTextBox.Text = color.B.ToString();
+                convertSrgbToVec3();
+            }
+            catch
+            {
+                // Conversion error occured.
+                FrostyMessageBox.Show("Invalid hexadecimal code.", "Conversion Error");
+            }
         }
 
         #region Color Channel Converting

@@ -106,7 +106,7 @@
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
                 <Label Content="Hexadecimal"/>
-                <TextBox x:Name="hexadecimalTextBox" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="2"/>
+                <TextBox x:Name="hexadecimalTextBox" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="2" TextChanged="hexadecimalTextBox_TextChanged"/>
             </Grid>
 
             <!-- Import from Clipboard -->
@@ -191,7 +191,6 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Frame x:Name="colorPreviewFrame" Width="192" Height="192" Background="Black" BorderBrush="#454545" BorderThickness="1" Grid.Row="1"/>
-                    <Button x:Name="openColorPickerButton" Content="Open Color Picker" Grid.Row="3" Click="openColorPickerButton_Click"/>
                 </Grid>
             </ctrl:FrostyDockablePanel>
         </Grid>
