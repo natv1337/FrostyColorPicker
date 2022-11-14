@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FrostyColorPicker.Windows"
         xmlns:ctrl="clr-namespace:Frosty.Controls;assembly=FrostyControls"
+        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         mc:Ignorable="d"
-        Title="Color Picker" Height="450" Width="800"
-        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="Color Conversion" Height="505" Width="430">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -18,132 +18,202 @@
     </Window.Resources>
 
     <Grid Background="{StaticResource ListBackground}">
-        <!-- Main Columns -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10" />
             <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="210" />
             <ColumnDefinition Width="10" />
         </Grid.ColumnDefinitions>
 
-        <!-- Hexadecimal / RGB Input + Output -->
-        <Grid Background="{StaticResource ListBackground}" Grid.ColumnSpan="2">
-
-            <StackPanel>
-                <!-- sRGB -->
-                <Grid Margin="10, 10, 10, 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="sRGB" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="fullRgbTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" />
-                </Grid>
-
-                <!-- Red -->
-                <Grid Margin="10 0 10 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="R" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="redValueTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" TextChanged="redValueTextBox_TextChanged" />
-                </Grid>
-
-                <!-- Green -->
-                <Grid Margin="10 0 10 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="G" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="greenValueTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" />
-                </Grid>
-
-                <!-- Blue -->
-                <Grid Margin="10 0 10 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="B" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="blueValueTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" />
-                </Grid>
-
-                <!-- Hexidecimal -->
-                <Grid Margin="10, 0, 10, 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="Hexadecimal" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="hexadecimalTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" TextChanged="hexadecimalTextBox_TextChanged" />
-                </Grid>
-            </StackPanel>
-        </Grid>
-
-        <!-- Vector 3 Input + Output -->
-        <Grid Background="{StaticResource ListBackground}" Grid.Column="2">
-            <StackPanel>
-                <!-- Vector 3 Input + Output -->
-                <Grid Margin="10, 10, 10, 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="Linear RGB" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="fullVec3TextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" />
-                </Grid>
-
-                <!-- Vector3[0] (X) Input + Output -->
-                <Grid Margin="10, 0, 10, 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="X" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="xValueTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" TextChanged="xValueTextBox_TextChanged" />
-                </Grid>
-                
-                <!-- Vector3[1] (Y) Input + Output -->
-                <Grid Margin="10, 0, 10, 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="Y" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="yValueTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" />
-                </Grid>
-
-                <!-- Vector3[2] (Z) Input + Output -->
-                <Grid Margin="10, 0, 10, 10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <Label Content="Z" FontFamily="Global User Interface" Grid.Row="0" />
-                    <TextBox x:Name="zValueTextBox" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" />
-                </Grid>
-                
-                <!-- Vector3 HDR Option -->
-                <Grid Margin="10, 28, 10, 10">
-                    <CheckBox x:Name="hdrToggle" Checked="hdrToggle_Checked">
-                        <TextBlock Text=" HDR" Foreground="White" />
-                    </CheckBox>
-                </Grid>
-            </StackPanel>
-        </Grid>
-
-        <Grid Background="{StaticResource ListBackground}" Grid.Column="3">
+        <!-- Color Input -->
+        
+        <!-- <Grid Background="{StaticResource ListBackground}" Grid.Column="0" Margin="10,10,0,10" Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
-            <Button Click="Button_Click" Margin="10">
-                Open Test Menu
-            </Button>
+
+            
+            <ctrl:FrostyDockablePanel Title="Standard Input">
+                <ctrl:FrostyTabControl>
+                    
+                    <TabItem Header="RGB" Width="60" HorizontalContentAlignment="Left">
+                        <Grid Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Content="R" FontFamily="Global User Interface" Grid.Row="0" />
+                                <TextBox x:Name="redTextBox" Text="0" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" TextChanged="redTextBox_TextChanged"/>
+                            </Grid>
+
+                            
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Content="G" Grid.Row="0"/>
+                                <TextBox x:Name="greenTextBox" Text="0" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" TextChanged="greenTextBox_TextChanged"/>
+                            </Grid>
+
+                            
+                            <Grid Grid.Row="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Label Content="B" Grid.Row="0"/>
+                                <TextBox x:Name="blueTextBox" Text="0" FontSize="14" Width="128" Margin="1" BorderThickness="1" Grid.Row="1" TextChanged="blueTextBox_TextChanged"/>
+                            </Grid>
+
+
+                        </Grid>
+                    </TabItem>
+
+                    
+                    <TabItem Header="HSV" Width="60" HorizontalContentAlignment="Left">
+
+                    </TabItem>
+
+                    
+                    <TabItem Header="CMYK" Width="60">
+
+                    </TabItem>
+                </ctrl:FrostyTabControl>
+            </ctrl:FrostyDockablePanel>
+
+            
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Label Content="Hexadecimal"/>
+                <TextBox x:Name="hexadecimalTextBox" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="2" TextChanged="hexadecimalTextBox_TextChanged"/>
+            </Grid>
+
+            
+            <Button x:Name="importValuefromClipboardButton" Foreground="White" ToolTip="Imports Vec3 data copied to the clipboard." Content="Import from Clipboard" Margin="0, 10, 0, 10" Grid.Row="2" Click="importValuefromClipboardButton_Click" />
+        </Grid> -->
+
+        <!-- Color Picker -->
+        <Grid Background="{StaticResource ListBackground}" Grid.Column="0" Margin="10,10,0,0" Width="200">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <ctrl:FrostyDockablePanel Title="Color Picker">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="180" />
+                        <RowDefinition Height="24" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="5" />
+                    </Grid.RowDefinitions>
+                    <colorpicker:SquarePicker x:Name="squarePicker" Grid.Row="1" ColorChanged="SquarePicker_ColorChanged" />
+
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <colorpicker:HexColorTextBox x:Name="hexColorTextBox" Grid.Column="1" ColorChanged="hexColorTextBox_ColorChanged" />
+                        <Frame x:Name="colorPreviewFrame" Background="White" Grid.Column="2" Margin="0, 5, 0, 5"/>
+                    </Grid>
+
+                    <colorpicker:ColorSliders x:Name="colorSliders" Grid.Row="3" ColorChanged="colorSliders_ColorChanged" />
+                    <!-- <colorpicker:StandardColorPicker x:Name="colorPickerControl" ColorChanged="StandardColorPicker_ColorChanged"/> -->
+                    <!-- Intensity Multiplier -->
+                    <CheckBox x:Name="useIntensityMultiplierCheckBox" Margin="5, 0, 0, 2" Foreground="White" ToolTip="Multiplies the Vec3 output by a desired amount." Grid.Row="4" Checked="useIntensityMultiplierCheckBox_Checked" Unchecked="useIntensityMultiplierCheckBox_Unchecked">
+                        <TextBlock Text=" Use Intensity Multiplier" Foreground="White" />
+                    </CheckBox>
+                    <TextBox x:Name="intensityMultiplierBox" Text="1.0" IsEnabled="False" FontSize="14" Margin="5, 0, 5, 0" BorderThickness="1" Grid.Row="5" TextChanged="intensityMultiplierBox_TextChanged" />
+                </Grid>
+            </ctrl:FrostyDockablePanel>
+            <Button x:Name="importValuefromClipboardButton" Foreground="White" ToolTip="Imports Vec3 data copied to the clipboard." Content="Import from Clipboard" Margin="0, 10, 0, 10" Grid.Row="1" Click="importValuefromClipboardButton_Click" />
+        </Grid>
+        
+        <!-- Vector 3 Input/Output -->
+        <Grid Background="{StaticResource ListBackground}" Grid.Column="1" Margin="10,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <ctrl:FrostyDockablePanel Title="Vector3">
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <!-- "Output Type" Label -->
+                        <RowDefinition Height="auto" />
+                        <!-- Type ComboBox -->
+                        <RowDefinition Height="auto" />
+                        <!-- "X" Label -->
+                        <RowDefinition Height="auto" />
+                        <!-- X Textbox -->
+                        <RowDefinition Height="auto" />
+                        <!-- "Y" Label -->
+                        <RowDefinition Height="auto" />
+                        <!-- Y Textbox -->
+                        <RowDefinition Height="auto" />
+                        <!-- "Z" Label -->
+                        <RowDefinition Height="auto" />
+                        <!-- Z Textbox -->
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Output Type -->
+                    <Label Content="Conversion Type" Grid.Row="0" />
+                    <!-- Margin="0, 30, 0, 0" -->
+                    <ComboBox x:Name="outputTypeComboBox" Grid.Row="1" SelectedIndex="0" SelectionChanged="outputTypeComboBox_SelectionChanged">
+                        <ComboBoxItem>Simple Linear</ComboBoxItem>
+                        <ComboBoxItem>Linear</ComboBoxItem>
+                    </ComboBox>
+
+                    <!-- X -->
+                    <Label Content="X" Grid.Row="2" />
+                    <TextBox x:Name="xValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="3" TextChanged="xValueTextBox_TextChanged" />
+
+                    <!-- Y -->
+                    <Label Content="Y" Grid.Row="4" />
+                    <TextBox x:Name="yValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="5" TextChanged="yValueTextBox_TextChanged" />
+
+                    <!-- Z -->
+                    <Label Content="Z" Grid.Row="6" />
+                    <TextBox x:Name="zValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="7" TextChanged="zValueTextBox_TextChanged" />
+
+                    <!-- Intensity Multiplier -->
+                    <CheckBox x:Name="calculateHdrCheckbox" Foreground="White" ToolTip="Automatically calculates HDR into the Vector3 output." Grid.Row="9" Checked="calculateHdrCheckbox_Checked" Unchecked="calculateHdrCheckbox_Unchecked">
+                        <TextBlock Text=" Calculate HDR" Foreground="White" />
+                    </CheckBox>
+
+                </Grid>
+            </ctrl:FrostyDockablePanel>
+
+            <Button x:Name="exportValueToClipboardButton" Foreground="White" ToolTip="Exports Vec3 data to the clipboard." Content="Export to Clipboard" Margin="0, 10, 0, 10" Grid.Row="1" Click="exportValueToClipboardButton_Click" />
         </Grid>
     </Grid>
+
 </ctrl:FrostyDockableWindow>
