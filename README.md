@@ -1,5 +1,5 @@
 # FrostyColorPicker
-A [FrostyEditor](https://github.com/CadeEvs/FrostyToolsuite) plugin for converting Vector colors to and from RGB channels and hexadecimal codes.
+A [FrostyEditor](https://github.com/CadeEvs/FrostyToolsuite) plugin for converting Vector colors to and from other color methods.
 
 ## Compiling
 1) Download the code or clone this repository.
