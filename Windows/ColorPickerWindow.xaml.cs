@@ -13,10 +13,9 @@ namespace FrostyColorPicker.Windows
     /// </summary>
     public partial class ColorPickerWindow : FrostyDockableWindow
     {
-        // Should help prevent event recursion.
-        bool focusSquarePicker = false;
-        bool focusSliders = false;
-        bool focusHex = false;
+        // My stupid solution for trying to stop these functions from recursively calling each other. But I guess the important thing is that it works.
+        bool dontUpdateControls = false;
+        bool convert = true;
 
         public ColorPickerWindow()
         {
@@ -31,7 +30,7 @@ namespace FrostyColorPicker.Windows
                 return;
 
             // Re-calculate srgb channel values.
-            convertVec3ToSrgb();
+            convertVectorToSrgb();
         }
 
         private void yValueTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -41,7 +40,7 @@ namespace FrostyColorPicker.Windows
                 return;
 
             // Re-calculate srgb channel values.
-            convertVec3ToSrgb();
+            convertVectorToSrgb();
         }
 
         private void zValueTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -51,7 +50,17 @@ namespace FrostyColorPicker.Windows
                 return;
 
             // Re-calculate srgb channel values.
-            convertVec3ToSrgb();
+            convertVectorToSrgb();
+        }
+
+        private void wValueTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Prevent recursion by checking if the control is focused.
+            if (!wValueTextBox.IsFocused)
+                return;
+
+            // Re-calculate srgb channel values.
+            convertVectorToSrgb();
         }
 
         private void useIntensityMultiplierCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -108,8 +117,19 @@ namespace FrostyColorPicker.Windows
 
             // Try to get a Vector3 out of the clipboard data.
             // Gets Frosty's Vector3 class
-            dynamic vec3 = TypeLibrary.CreateObject("Vec3");
-            vec3 = obj; // Moves the clipboard data into the vector3 instance.
+
+            dynamic vector;
+
+            if (vector4ToggleCheckbox.IsChecked == true)
+            {
+                vector = TypeLibrary.CreateObject("Vec4");
+                vector = obj; // Moves the clipboard data into the vector3 instance.
+            }
+            else
+            {
+                vector = TypeLibrary.CreateObject("Vec3");
+                vector = obj; // Moves the clipboard data into the vector3 instance.
+            }
 
             float hdrDivisor = 1;
             // Intensity multiplier for the certain assets that benefit from it.
@@ -117,17 +137,26 @@ namespace FrostyColorPicker.Windows
             if (useIntensityMultiplierCheckBox.IsChecked == true) // Use the user-defined intensity multiplier if the box is checked.
                 intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
 
-            // Update X/Y/Z text boxes accordingly.
-            xValueTextBox.Text = (vec3.x * intensityMultiplier).ToString();
-            yValueTextBox.Text = (vec3.y * intensityMultiplier).ToString();
-            zValueTextBox.Text = (vec3.z * intensityMultiplier).ToString();
+            // Update X/Y/Z/W text boxes accordingly.
+            xValueTextBox.Text = (vector.x * intensityMultiplier).ToString();
+            yValueTextBox.Text = (vector.y * intensityMultiplier).ToString();
+            zValueTextBox.Text = (vector.z * intensityMultiplier).ToString();
 
-            if (vec3.x > 1 || vec3.y > 1 || vec3.z > 1)
+            try
+            {
+                wValueTextBox = vector.w.ToString();
+            }
+            catch
+            {
+                // Not a Vec4
+            }
+
+            if (vector.x > 1 || vector.y > 1 || vector.z > 1)
             {
                 calculateHdrCheckbox.IsChecked = true;
 
                 // With HDR calculation being enabled, we need to grab the largest of the three values in the vector and divide them all by it.
-                hdrDivisor = getHighestVec3Value(vec3.x, vec3.y, vec3.z);
+                hdrDivisor = getHighestVec3Value(vector.x, vector.y, vector.z);
             }
 
             // Checks for output type
@@ -137,26 +166,26 @@ namespace FrostyColorPicker.Windows
                 if (calculateHdrCheckbox.IsChecked == true)
                 {
                     // Divide by HDR divisor.
-                    vec3.x /= hdrDivisor;
-                    vec3.y /= hdrDivisor;
-                    vec3.z /= hdrDivisor;
+                    vector.x /= hdrDivisor;
+                    vector.y /= hdrDivisor;
+                    vector.z /= hdrDivisor;
                 }
 
                 // Update color picker controls.
-                updateSquarePickerSimple(vec3.x, vec3.y, vec3.z);
+                updateSquarePickerSimple(vector.x, vector.y, vector.z);
             }
             else if (outputTypeComboBox.SelectedIndex == 1) // Linear
             {
                 // Check if we should calculate with HDR.
                 if (calculateHdrCheckbox.IsChecked == true)
                 {
-                    vec3.x /= hdrDivisor;
-                    vec3.y /= hdrDivisor;
-                    vec3.z /= hdrDivisor;
+                    vector.x /= hdrDivisor;
+                    vector.y /= hdrDivisor;
+                    vector.z /= hdrDivisor;
                 }
 
                 // Update color picker controls.
-                updateSquarePickerLinear(vec3.x, vec3.y, vec3.z);
+                updateSquarePickerLinear(vector.x, vector.y, vector.z);
             }
         }
 
@@ -165,32 +194,40 @@ namespace FrostyColorPicker.Windows
         {
             try
             {
-                // Create an instance of Frosty's Vector3 class.
-                dynamic vec3 = TypeLibrary.CreateObject("Vec3");
+                dynamic vector;
+
+                // Create an instance of Frosty's Vector3/4 class.
+                if (vector4ToggleCheckbox.IsChecked == true)
+                    vector = TypeLibrary.CreateObject("Vec4");
+                else
+                    vector = TypeLibrary.CreateObject("Vec3");
 
                 // Try to parse the values in the X/Y/Z text boxes into the Vector.
-                vec3.x = float.Parse(xValueTextBox.Text);
-                vec3.y = float.Parse(yValueTextBox.Text);
-                vec3.z = float.Parse(zValueTextBox.Text);
+                vector.x = float.Parse(xValueTextBox.Text);
+                vector.y = float.Parse(yValueTextBox.Text);
+                vector.z = float.Parse(zValueTextBox.Text);
 
-                object obj = vec3; // Create an object with the Vector's data.
+                // If it's a Vec4, move the W value into vector.w
+                if (vector4ToggleCheckbox.IsChecked == true)
+                    vector.w = float.Parse(wValueTextBox.Text);
+
+                object obj = vector; // Create an object with the Vector's data.
                 FrostyClipboard.Current.SetData(obj); // Move the object into the FrostyClipboard.
             }
             catch
             {
                 // Throw float parse failure error.
-                FrostyMessageBox.Show("One of your Vector3 values are invalid (they should be floating-point numbers).", "Clipboard Export Error");
+                FrostyMessageBox.Show("One of your Vector values are invalid (they should be floating-point numbers).", "Clipboard Export Error");
             }
         }
 
         private void SquarePicker_ColorChanged(object sender, RoutedEventArgs e)
         {
-            // If other pickers are in focus, return.
-            if (focusSliders || focusHex)
+            // Try to stop recursion.
+            if (dontUpdateControls)
                 return;
 
-            // Set focus to true to prevent code from other color picker controls being executed.
-            focusSquarePicker = true;
+            dontUpdateControls = true;
 
             // Set other control colors to the current color of this one.
             hexColorTextBox.SelectedColor = squarePicker.SelectedColor;
@@ -201,21 +238,18 @@ namespace FrostyColorPicker.Windows
             colorPreviewFrame.Background = newBrush;
 
             // Update Vec3 values.
-            convertSrgbToVec3();
-
-            // Stop focus.
-            focusSquarePicker = false;
+            if (convert)
+                convertSrgbToVec3();
+            dontUpdateControls = false;
         }
 
         private void colorSliders_ColorChanged(object sender, RoutedEventArgs e)
         {
-            // If other pickers are in focus, return.
-            if (focusSquarePicker || focusHex)
+            // Try to stop recursion.
+            if (dontUpdateControls)
                 return;
 
-            // Set focus to true to prevent code from other color picker controls being executed.
-            focusSliders = true;
-
+            dontUpdateControls = true;
             // Set other control colors to the current color of this one.
             squarePicker.SelectedColor = colorSliders.SelectedColor;
             hexColorTextBox.SelectedColor = colorSliders.SelectedColor;
@@ -226,20 +260,16 @@ namespace FrostyColorPicker.Windows
 
             // Update Vec3 values.
             convertSrgbToVec3();
-            
-            // Stop focus.
-            focusSliders = false;
+            dontUpdateControls = false;
         }
 
         private void hexColorTextBox_ColorChanged(object sender, RoutedEventArgs e)
         {
-            // If other pickers are in focus, return.
-            if (focusSquarePicker || focusSliders)
+            // Try to stop recursion.
+            if (dontUpdateControls)
                 return;
 
-            // Set focus to true to prevent code from other color picker controls being executed.
-            focusHex = true;
-
+            dontUpdateControls = true;
             // Set other control colors to the current color of this one.
             squarePicker.SelectedColor = hexColorTextBox.SelectedColor;
             colorSliders.SelectedColor = hexColorTextBox.SelectedColor;
@@ -250,9 +280,7 @@ namespace FrostyColorPicker.Windows
 
             // Update Vec3 values.
             convertSrgbToVec3();
-
-            // Stop focus.
-            focusHex = false;
+            dontUpdateControls = false;
         }
         #endregion
 
@@ -301,7 +329,7 @@ namespace FrostyColorPicker.Windows
                 if (useIntensityMultiplierCheckBox.IsChecked == true)
                     intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
 
-                float x = 0, y = 0, z = 0;
+                float x = 0, y = 0, z = 0, w = 0;
 
                 // Checks for output type to accurately convert colors for their proper use case.
                 if (outputTypeComboBox.SelectedIndex == 0) // For simple sRGB Linear.
@@ -309,12 +337,14 @@ namespace FrostyColorPicker.Windows
                     x = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.R.ToString()));
                     y = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.G.ToString()));
                     z = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.B.ToString()));
+                    w = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.A.ToString()));
                 }
                 else if (outputTypeComboBox.SelectedIndex == 1) // For sRGB Linear.
                 {
                     x = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.R.ToString()) / 255);
                     y = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.G.ToString()) / 255);
                     z = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.B.ToString()) / 255);
+                    w = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.A.ToString()) / 255);
                 }
 
                 if (calculateHdrCheckbox.IsChecked == true)
@@ -330,25 +360,27 @@ namespace FrostyColorPicker.Windows
                 xValueTextBox.Text = x.ToString();
                 yValueTextBox.Text = y.ToString();
                 zValueTextBox.Text = z.ToString();
+                wValueTextBox.Text = w.ToString();
             }
             catch
             {
-
+                // lol
             }
         }
 
-        public void convertVec3ToSrgb()
+        public void convertVectorToSrgb()
         {
             float intensityMultiplier = 1;
             if (useIntensityMultiplierCheckBox.IsChecked == true)
                 intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
 
-            float x, y, z;
+            float x, y, z, w;
             try
             {
                 x = float.Parse(xValueTextBox.Text);
                 y = float.Parse(yValueTextBox.Text);
                 z = float.Parse(zValueTextBox.Text);
+                w = float.Parse(wValueTextBox.Text);
             }
             catch
             {
@@ -370,15 +402,26 @@ namespace FrostyColorPicker.Windows
                 x = (float)Math.Round(linearSimpleFloatToSrgbChannel(x) / intensityMultiplier);
                 y = (float)Math.Round(linearSimpleFloatToSrgbChannel(y) / intensityMultiplier);
                 z = (float)Math.Round(linearSimpleFloatToSrgbChannel(z) / intensityMultiplier);
+                w = (float)Math.Round(linearSimpleFloatToSrgbChannel(w) / intensityMultiplier);
             }
             else if (outputTypeComboBox.SelectedIndex == 1)
             {
                 x = (float)Math.Round(linearFloatToSrgbChannel(x) * 255 / intensityMultiplier);
                 y = (float)Math.Round(linearFloatToSrgbChannel(y) * 255 / intensityMultiplier);
                 z = (float)Math.Round(linearFloatToSrgbChannel(z) * 255 / intensityMultiplier);
+                w = (float)Math.Round(linearFloatToSrgbChannel(w) * 255 / intensityMultiplier);
             }
 
-            squarePicker.SelectedColor = Color.FromArgb(255, byte.Parse(x.ToString()), byte.Parse(y.ToString()), byte.Parse(z.ToString())); // This shouldn't be calling the other functions, but it works :p
+            try
+            {
+                convert = false;
+                squarePicker.SelectedColor = Color.FromArgb(byte.Parse(w.ToString()), byte.Parse(x.ToString()), byte.Parse(y.ToString()), byte.Parse(z.ToString())); // This shouldn't be calling the other functions, but it works :p
+            }
+            catch
+            {
+                // Nope
+            }
+            convert = true;
         }
 
         // Update color picker controls based on linear srgb channels.
@@ -414,5 +457,15 @@ namespace FrostyColorPicker.Windows
                 return vecZ;
         }
         #endregion
+
+        private void vector4ToggleCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            wValueTextBox.IsEnabled = true;
+        }
+
+        private void vector4ToggleCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            wValueTextBox.IsEnabled = false;
+        }
     }
 }

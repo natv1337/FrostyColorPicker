@@ -75,7 +75,7 @@
                 <RowDefinition Height="auto" /> <!-- Export to Clipboard Button -->
             </Grid.RowDefinitions>
 
-            <ctrl:FrostyDockablePanel Title="Vector3">
+            <ctrl:FrostyDockablePanel Title="Vector">
                 <Grid Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto" /> <!-- "Conversion Type Label -->
@@ -86,7 +86,10 @@
                         <RowDefinition Height="auto" /> <!-- Y Value TextBox -->
                         <RowDefinition Height="auto" /> <!-- "Z" Label -->
                         <RowDefinition Height="auto" /> <!-- Z Value TextBox -->
+                        <RowDefinition Height="auto" /> <!-- Z Value TextBox -->
+                        <RowDefinition Height="auto" /> <!-- Z Value TextBox -->
                         <RowDefinition Height="*"/> <!-- Separator -->
+                        <RowDefinition Height="auto"/> <!-- Calculate HDR TextBox -->
                         <RowDefinition Height="auto"/> <!-- Calculate HDR TextBox -->
                     </Grid.RowDefinitions>
 
@@ -110,8 +113,17 @@
                     <Label Content="Z" Grid.Row="6" />
                     <TextBox x:Name="zValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="7" TextChanged="zValueTextBox_TextChanged" />
 
+                    <!-- W -->
+                    <Label Content="W" Grid.Row="8" />
+                    <TextBox x:Name="wValueTextBox" Text="0" FontSize="14" IsEnabled="False" Margin="1" BorderThickness="1" Grid.Row="9" TextChanged="wValueTextBox_TextChanged" />
+
+                    <!-- Vector4 Toggle -->
+                    <CheckBox x:Name="vector4ToggleCheckbox" Foreground="White" Grid.Row="11" Margin="0, 0, 0, 2" Checked="vector4ToggleCheckbox_Checked" Unchecked="vector4ToggleCheckbox_Unchecked">
+                        <TextBlock Text=" Vector4" Foreground="White" />
+                    </CheckBox>
+                    
                     <!-- Intensity Multiplier -->
-                    <CheckBox x:Name="calculateHdrCheckbox" Foreground="White" ToolTip="Automatically calculates HDR into the Vector3 output." Grid.Row="9" Checked="calculateHdrCheckbox_Checked" Unchecked="calculateHdrCheckbox_Unchecked">
+                    <CheckBox x:Name="calculateHdrCheckbox" Foreground="White" ToolTip="Automatically calculates HDR into the Vector3 output." Grid.Row="12" Checked="calculateHdrCheckbox_Checked" Unchecked="calculateHdrCheckbox_Unchecked">
                         <TextBlock Text=" Calculate HDR" Foreground="White" />
                     </CheckBox>
 
