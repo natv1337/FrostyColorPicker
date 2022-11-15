@@ -93,6 +93,16 @@ namespace FrostyColorPicker.Windows
             convertSrgbToVec3();
         }
 
+        private void vector4ToggleCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            wValueTextBox.IsEnabled = true;
+        }
+
+        private void vector4ToggleCheckbox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            wValueTextBox.IsEnabled = false;
+        }
+
         private void calculateHdrCheckbox_Checked(object sender, RoutedEventArgs e)
         {
             // Re-calculate vec3 values upon changing the checkbox.
@@ -115,19 +125,16 @@ namespace FrostyColorPicker.Windows
             // Get clipboard data.
             object obj = FrostyClipboard.Current.GetData();
 
-            // Try to get a Vector3 out of the clipboard data.
-            // Gets Frosty's Vector3 class
-
+            // Try to get either a Vec3 or Vec4 out of the clipboard data.
             dynamic vector;
-
-            if (vector4ToggleCheckbox.IsChecked == true)
+            if (vector4ToggleCheckbox.IsChecked == true) // Gets Frosty's Vec4 class
             {
                 vector = TypeLibrary.CreateObject("Vec4");
                 vector = obj; // Moves the clipboard data into the vector3 instance.
             }
             else
             {
-                vector = TypeLibrary.CreateObject("Vec3");
+                vector = TypeLibrary.CreateObject("Vec3"); // Gets Frosty's Vec3 class
                 vector = obj; // Moves the clipboard data into the vector3 instance.
             }
 
@@ -137,20 +144,25 @@ namespace FrostyColorPicker.Windows
             if (useIntensityMultiplierCheckBox.IsChecked == true) // Use the user-defined intensity multiplier if the box is checked.
                 intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
 
-            // Update X/Y/Z/W text boxes accordingly.
-            xValueTextBox.Text = (vector.x * intensityMultiplier).ToString();
-            yValueTextBox.Text = (vector.y * intensityMultiplier).ToString();
-            zValueTextBox.Text = (vector.z * intensityMultiplier).ToString();
-
+            // try-catch here to ensure that vector is actually is actually a Vec3/Vec4.
             try
             {
-                wValueTextBox = vector.w.ToString();
+                // Update X/Y/Z/W text boxes accordingly.
+                xValueTextBox.Text = (vector.x * intensityMultiplier).ToString();
+                yValueTextBox.Text = (vector.y * intensityMultiplier).ToString();
+                zValueTextBox.Text = (vector.z * intensityMultiplier).ToString();
             }
             catch
             {
-                // Not a Vec4
+                FrostyMessageBox.Show("Clipboard data is not of type Vec3 or Vec4.", "Clipboard Error");
+                return;
             }
 
+            // Import W value if it's a Vec4.
+            if (vector4ToggleCheckbox.IsChecked == true)
+                wValueTextBox.Text = vector.w.ToString();
+
+            // Enables HDR calculation if value is > 1.
             if (vector.x > 1 || vector.y > 1 || vector.z > 1)
             {
                 calculateHdrCheckbox.IsChecked = true;
@@ -216,8 +228,8 @@ namespace FrostyColorPicker.Windows
             }
             catch
             {
-                // Throw float parse failure error.
-                FrostyMessageBox.Show("One of your Vector values are invalid (they should be floating-point numbers).", "Clipboard Export Error");
+                // Should be caught if one of the vector values are invalid.
+                FrostyMessageBox.Show("One of your vector values are invalid (they should be floating-point numbers).", "Clipboard Error");
             }
         }
 
@@ -334,16 +346,16 @@ namespace FrostyColorPicker.Windows
                 // Checks for output type to accurately convert colors for their proper use case.
                 if (outputTypeComboBox.SelectedIndex == 0) // For simple sRGB Linear.
                 {
-                    x = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.R.ToString()));
-                    y = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.G.ToString()));
-                    z = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.B.ToString()));
+                    x = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.R.ToString()) * intensityMultiplier);
+                    y = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.G.ToString()) * intensityMultiplier);
+                    z = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.B.ToString()) * intensityMultiplier);
                     w = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.A.ToString()));
                 }
                 else if (outputTypeComboBox.SelectedIndex == 1) // For sRGB Linear.
                 {
-                    x = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.R.ToString()) / 255);
-                    y = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.G.ToString()) / 255);
-                    z = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.B.ToString()) / 255);
+                    x = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.R.ToString()) / 255 * intensityMultiplier);
+                    y = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.G.ToString()) / 255 * intensityMultiplier);
+                    z = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.B.ToString()) / 255 * intensityMultiplier);
                     w = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.A.ToString()) / 255);
                 }
 
@@ -457,15 +469,5 @@ namespace FrostyColorPicker.Windows
                 return vecZ;
         }
         #endregion
-
-        private void vector4ToggleCheckbox_Checked(object sender, RoutedEventArgs e)
-        {
-            wValueTextBox.IsEnabled = true;
-        }
-
-        private void vector4ToggleCheckbox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            wValueTextBox.IsEnabled = false;
-        }
     }
 }
