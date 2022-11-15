@@ -4,7 +4,7 @@ A [FrostyEditor](https://github.com/CadeEvs/FrostyToolsuite) plugin for converti
 ## Compiling
 1) Download the code or clone this repository.
 2) Open the .sln or .csproj and add the missing assemblies.
-	- The Frosty assemblies can be obtained from your FrostyEditor installation.
+	- The FrostyControls, FrostyCore, and FrostySdk assemblies can be obtained from your FrostyEditor installation.
 	- Install the Microsoft.CSharp, Microsoft.Xaml.Behaviors.Wpf, and PixiEditor.ColorPicker nuget packages.
 3) Build with any configuration or your choice.
 
