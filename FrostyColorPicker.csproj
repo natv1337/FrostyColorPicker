@@ -49,9 +49,6 @@
     <Reference Include="FrostyCore">
       <HintPath>..\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyCore.dll</HintPath>
     </Reference>
-    <Reference Include="FrostyHash">
-      <HintPath>..\FrostyToolsuite\FrostyEditor\bin\Developer\Debug\FrostyHash.dll</HintPath>
-    </Reference>
     <Reference Include="FrostySdk">
       <HintPath>..\FrostyToolsuite\FrostySdk\bin\Developer\Debug\FrostySdk.dll</HintPath>
     </Reference>
