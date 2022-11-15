@@ -1,12 +1,10 @@
-﻿using Frosty.Controls;
-using Frosty.Core.Controls;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Frosty.Controls;
+using Frosty.Core.Controls;
 using FrostySdk;
-using Microsoft.CSharp.RuntimeBinder;
-using ColorPicker;
 
 namespace FrostyColorPicker.Windows
 {
@@ -54,17 +52,7 @@ namespace FrostyColorPicker.Windows
                     calculateHdrCheckbox.IsChecked = true;
 
                     // With HDR calculation being enabled, we need to grab the largest of the three values in the vector and divide them all by it.
-                    if (vec3.x > vec3.y)
-                    {
-                        if (vec3.x > vec3.z)
-                            hdrDivisor = vec3.x;
-                        else
-                            hdrDivisor = vec3.z;
-                    }
-                    else if (vec3.y > vec3.z)
-                        hdrDivisor = vec3.y;
-                    else
-                        hdrDivisor = vec3.z;
+                    hdrDivisor = getHighestVec3Value(vec3.x, vec3.y, vec3.z);
                 }
 
                 // Checks for output type
@@ -88,15 +76,9 @@ namespace FrostyColorPicker.Windows
                         vec3.x /= hdrDivisor;
                         vec3.y /= hdrDivisor;
                         vec3.z /= hdrDivisor;
-                        //redTextBox.Text = (Math.Round(linearFloatToSrgbChannel(vec3.x / 1.5f) * 255)).ToString();
-                        //greenTextBox.Text = (Math.Round(linearFloatToSrgbChannel(vec3.y / 1.5f) * 255)).ToString();
-                        //blueTextBox.Text = (Math.Round(linearFloatToSrgbChannel(vec3.z / 1.5f) * 255)).ToString();
                     }
 
                     updateSquarePickerLinear(vec3.x, vec3.y, vec3.z);
-                        //redTextBox.Text = (Math.Round(linearFloatToSrgbChannel(vec3.x) * 255)).ToString();
-                        //greenTextBox.Text = (Math.Round(linearFloatToSrgbChannel(vec3.y) * 255)).ToString();
-                        //blueTextBox.Text = (Math.Round(linearFloatToSrgbChannel(vec3.z) * 255)).ToString();
                 }
         }
 
@@ -105,7 +87,7 @@ namespace FrostyColorPicker.Windows
             string red = (Math.Round(linearFloatToSrgbChannel(vecX) * 255f)).ToString();
             string green = (Math.Round(linearFloatToSrgbChannel(vecY) * 255f)).ToString();
             string blue = (Math.Round(linearFloatToSrgbChannel(vecZ) * 255f)).ToString();
-            squarePicker.SelectedColor = System.Windows.Media.Color.FromArgb(255, byte.Parse(red), byte.Parse(green), byte.Parse(blue));
+            squarePicker.SelectedColor = Color.FromArgb(255, byte.Parse(red), byte.Parse(green), byte.Parse(blue));
         }
 
         public void updateSquarePickerSimple(float vecX, float vecY, float vecZ)
@@ -113,7 +95,7 @@ namespace FrostyColorPicker.Windows
             string red = (Math.Round(linearSimpleFloatToSrgbChannel(vecX))).ToString();
             string green = (Math.Round(linearSimpleFloatToSrgbChannel(vecY))).ToString();
             string blue = (Math.Round(linearSimpleFloatToSrgbChannel(vecZ))).ToString();
-            squarePicker.SelectedColor = System.Windows.Media.Color.FromArgb(255, byte.Parse(red), byte.Parse(green), byte.Parse(blue));
+            squarePicker.SelectedColor = Color.FromArgb(255, byte.Parse(red), byte.Parse(green), byte.Parse(blue));
         }
 
         #region Vector3 Input
@@ -234,44 +216,41 @@ namespace FrostyColorPicker.Windows
 
         public void convertSrgbToVec3()
         {
-            try
+            try // Random crash if this try-catch doesn't exist. Is the color picker trying to call it before it loads??
             {
                 // Another check for seeing whether or not to use a user-defined intensity multiplier.
                 float intensityMultiplier = 1;
                 if (useIntensityMultiplierCheckBox.IsChecked == true)
                     intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
 
+                float x = 0, y = 0, z = 0;
+
                 // Checks for output type to accurately convert colors for their proper use case.
                 if (outputTypeComboBox.SelectedIndex == 0) // For simple sRGB Linear.
                 {
-                    if (calculateHdrCheckbox.IsChecked == true)
-                    {
-                        //xValueTextBox.Text = ((srgbChannelToLinearSimple(float.Parse(redTextBox.Text)) * 1.5) * intensityMultiplier).ToString();
-                        //yValueTextBox.Text = ((srgbChannelToLinearSimple(float.Parse(greenTextBox.Text)) * 1.5) * intensityMultiplier).ToString();
-                        //zValueTextBox.Text = ((srgbChannelToLinearSimple(float.Parse(blueTextBox.Text)) * 1.5) * intensityMultiplier).ToString();
-                    }
-                    else
-                    {
-                        //xValueTextBox.Text = (srgbChannelToLinearSimple(float.Parse(redTextBox.Text)) * intensityMultiplier).ToString();
-                        //yValueTextBox.Text = (srgbChannelToLinearSimple(float.Parse(greenTextBox.Text)) * intensityMultiplier).ToString();
-                        //zValueTextBox.Text = (srgbChannelToLinearSimple(float.Parse(blueTextBox.Text)) * intensityMultiplier).ToString();
-                    }
+                    x = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.R.ToString()));
+                    y = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.G.ToString()));
+                    z = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.B.ToString()));
                 }
                 else if (outputTypeComboBox.SelectedIndex == 1) // For sRGB Linear.
                 {
-                    if (calculateHdrCheckbox.IsChecked == true)
-                    {
-                        //xValueTextBox.Text = ((srgbChannelToLinear(float.Parse(redTextBox.Text) / 255) * 1.5) * intensityMultiplier).ToString();
-                        //yValueTextBox.Text = ((srgbChannelToLinear(float.Parse(greenTextBox.Text) / 255) * 1.5) * intensityMultiplier).ToString();
-                        //zValueTextBox.Text = ((srgbChannelToLinear(float.Parse(blueTextBox.Text) / 255) * 1.5) * intensityMultiplier).ToString();
-                    }
-                    else
-                    {
-                        //xValueTextBox.Text = (srgbChannelToLinear(float.Parse(redTextBox.Text) / 255) * intensityMultiplier).ToString();
-                        //yValueTextBox.Text = (srgbChannelToLinear(float.Parse(greenTextBox.Text) / 255) * intensityMultiplier).ToString();
-                        //zValueTextBox.Text = (srgbChannelToLinear(float.Parse(blueTextBox.Text) / 255) * intensityMultiplier).ToString();
-                    }
+                    x = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.R.ToString()) / 255);
+                    y = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.G.ToString()) / 255);
+                    z = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.B.ToString()) / 255);
                 }
+
+                if (calculateHdrCheckbox.IsChecked == true)
+                {
+                    // Idk why this doesn't work :/
+                    //float hdrMultiplier = getHighestVec3Value(x, y, z);
+                    //x *= hdrMultiplier;
+                    //y *= hdrMultiplier;
+                    //z *= hdrMultiplier;
+                }
+
+                xValueTextBox.Text = x.ToString();
+                yValueTextBox.Text = y.ToString();
+                zValueTextBox.Text = z.ToString();
             }
             catch
             {
@@ -281,45 +260,46 @@ namespace FrostyColorPicker.Windows
 
         public void convertVec3ToSrgb()
         {
+            float intensityMultiplier = 1;
+            if (useIntensityMultiplierCheckBox.IsChecked == true)
+                intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
+
+            float x, y, z;
             try
             {
-                float intensityMultiplier = 1;
-                if (useIntensityMultiplierCheckBox.IsChecked == true)
-                    intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
-
-                float x, y, z;
                 x = float.Parse(xValueTextBox.Text);
                 y = float.Parse(yValueTextBox.Text);
                 z = float.Parse(zValueTextBox.Text);
-
-                if (calculateHdrCheckbox.IsChecked == true)
-                {
-                    x /= 1.5f;
-                    y /= 1.5f;
-                    z /= 1.5f;
-                }
-
-                if (outputTypeComboBox.SelectedIndex == 0)
-                {
-                    x = (float)Math.Round(linearSimpleFloatToSrgbChannel(x) / intensityMultiplier);
-                    y = (float)Math.Round(linearSimpleFloatToSrgbChannel(y) / intensityMultiplier);
-                    z = (float)Math.Round(linearSimpleFloatToSrgbChannel(z) / intensityMultiplier );
-                }
-                else if (outputTypeComboBox.SelectedIndex == 1)
-                {
-                    x = (float)Math.Round(linearFloatToSrgbChannel(x) * 255 / intensityMultiplier);
-                    y = (float)Math.Round(linearFloatToSrgbChannel(y) * 255 / intensityMultiplier);
-                    z = (float)Math.Round(linearFloatToSrgbChannel(z) * 255 / intensityMultiplier);
-                }
-
-                //redTextBox.Text = x.ToString();
-                //greenTextBox.Text = y.ToString();
-                //blueTextBox.Text = z.ToString();
             }
             catch
             {
-
+                // Conversion Error
+                return;
             }
+
+            float hdrDivisor = getHighestVec3Value(x, y, z);
+
+            if (calculateHdrCheckbox.IsChecked == true)
+            {
+                x /= hdrDivisor;
+                y /= hdrDivisor;
+                z /= hdrDivisor;
+            }
+
+            if (outputTypeComboBox.SelectedIndex == 0)
+            {
+                x = (float)Math.Round(linearSimpleFloatToSrgbChannel(x) / intensityMultiplier);
+                y = (float)Math.Round(linearSimpleFloatToSrgbChannel(y) / intensityMultiplier);
+                z = (float)Math.Round(linearSimpleFloatToSrgbChannel(z) / intensityMultiplier);
+            }
+            else if (outputTypeComboBox.SelectedIndex == 1)
+            {
+                x = (float)Math.Round(linearFloatToSrgbChannel(x) * 255 / intensityMultiplier);
+                y = (float)Math.Round(linearFloatToSrgbChannel(y) * 255 / intensityMultiplier);
+                z = (float)Math.Round(linearFloatToSrgbChannel(z) * 255 / intensityMultiplier);
+            }
+
+            squarePicker.SelectedColor = Color.FromArgb(255, byte.Parse(x.ToString()), byte.Parse(y.ToString()), byte.Parse(z.ToString())); // This shouldn't be calling the other functions, but it works :p
         }
 
         private void SquarePicker_ColorChanged(object sender, RoutedEventArgs e)
@@ -334,10 +314,6 @@ namespace FrostyColorPicker.Windows
 
             var newBrush = new SolidColorBrush(squarePicker.SelectedColor);
             colorPreviewFrame.Background = newBrush;
-
-            //redTextBox.Text = squarePicker.SelectedColor.R.ToString();
-            //greenTextBox.Text = squarePicker.SelectedColor.G.ToString();
-            //blueTextBox.Text = squarePicker.SelectedColor.B.ToString();
 
             convertSrgbToVec3();
             focusSquarePicker = false;
@@ -355,10 +331,6 @@ namespace FrostyColorPicker.Windows
             var newBrush = new SolidColorBrush(squarePicker.SelectedColor);
             colorPreviewFrame.Background = newBrush;
 
-            //redTextBox.Text = squarePicker.SelectedColor.R.ToString();
-            //greenTextBox.Text = squarePicker.SelectedColor.G.ToString();
-            //blueTextBox.Text = squarePicker.SelectedColor.B.ToString();
-
             convertSrgbToVec3();
             focusSliders = false;
         }
@@ -375,12 +347,23 @@ namespace FrostyColorPicker.Windows
             var newBrush = new SolidColorBrush(squarePicker.SelectedColor);
             colorPreviewFrame.Background = newBrush;
 
-            //redTextBox.Text = squarePicker.SelectedColor.R.ToString();
-            //greenTextBox.Text = squarePicker.SelectedColor.G.ToString();
-            //blueTextBox.Text = squarePicker.SelectedColor.B.ToString();
-
             convertSrgbToVec3();
             focusHex = false;
+        }
+
+        public float getHighestVec3Value(float vecX, float vecY, float vecZ)
+        {
+            if (vecX > vecY)
+            {
+                if (vecX > vecZ)
+                    return vecX;
+                else
+                    return vecZ;
+            }
+            else if (vecY > vecZ)
+                return vecY;
+            else
+                return vecZ;
         }
     }
 }

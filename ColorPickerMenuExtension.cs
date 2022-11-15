@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Windows;
-using FrostyColorPicker;
 using Frosty.Core;
 using FrostyColorPicker.Windows;
 
