@@ -43,7 +43,7 @@
                         <RowDefinition Height="auto" /> <!-- Intensity Multiplier Input -->
                         <RowDefinition Height="5" />
                     </Grid.RowDefinitions>
-                    <colorpicker:SquarePicker x:Name="squarePicker" Grid.Row="1" ColorChanged="SquarePicker_ColorChanged" />
+                    <colorpicker:SquarePicker x:Name="squarePicker" Grid.Row="1" ColorChanged="SquarePicker_ColorChanged" ColorState="{Binding ElementName=colorSliders, Path=ColorState, Mode=TwoWay }"/>
 
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
@@ -52,11 +52,11 @@
                             <ColumnDefinition Width="64" /> <!-- colorPreviewFrame -->
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <colorpicker:HexColorTextBox x:Name="hexColorTextBox" Grid.Column="1" ColorChanged="hexColorTextBox_ColorChanged" />
+                        <colorpicker:HexColorTextBox x:Name="hexColorTextBox" Grid.Column="1" ColorChanged="hexColorTextBox_ColorChanged"/>
                         <Frame x:Name="colorPreviewFrame" Background="White" Grid.Column="2" Margin="0, 3, 0, 3"/>
                     </Grid>
 
-                    <colorpicker:ColorSliders x:Name="colorSliders" Grid.Row="3" ColorChanged="colorSliders_ColorChanged" />
+                    <colorpicker:ColorSliders x:Name="colorSliders"  Grid.Row="3" ColorChanged="colorSliders_ColorChanged" />
                     
                     <!-- Intensity Multiplier -->
                     <CheckBox x:Name="useIntensityMultiplierCheckBox" Margin="5, 0, 0, 2" Foreground="White" ToolTip="Multiplies the Vec3 output by a desired amount." Grid.Row="4" Checked="useIntensityMultiplierCheckBox_Checked" Unchecked="useIntensityMultiplierCheckBox_Unchecked">

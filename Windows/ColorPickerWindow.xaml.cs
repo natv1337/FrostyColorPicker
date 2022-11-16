@@ -16,6 +16,7 @@ namespace FrostyColorPicker.Windows
         // My stupid solution for trying to stop these functions from recursively calling each other. But I guess the important thing is that it works.
         bool dontUpdateControls = false;
         bool convert = true;
+        Brush currentColor;
 
         public ColorPickerWindow()
         {
@@ -138,7 +139,12 @@ namespace FrostyColorPicker.Windows
                 vector = obj; // Moves the clipboard data into the vector3 instance.
             }
 
-            float hdrDivisor = 1;
+            float hdr = 1;
+            if (vector.x > 1 || vector.y > 1 || vector.z > 1)
+                calculateHdrCheckbox.IsChecked = true;
+            if (calculateHdrCheckbox.IsChecked == true)
+                hdr = 1.5f;
+
             // Intensity multiplier for the certain assets that benefit from it.
             float intensityMultiplier = 1;
             if (useIntensityMultiplierCheckBox.IsChecked == true) // Use the user-defined intensity multiplier if the box is checked.
@@ -148,9 +154,9 @@ namespace FrostyColorPicker.Windows
             try
             {
                 // Update X/Y/Z/W text boxes accordingly.
-                xValueTextBox.Text = (vector.x * intensityMultiplier).ToString();
-                yValueTextBox.Text = (vector.y * intensityMultiplier).ToString();
-                zValueTextBox.Text = (vector.z * intensityMultiplier).ToString();
+                xValueTextBox.Text = (vector.x * intensityMultiplier * hdr).ToString();
+                yValueTextBox.Text = (vector.y * intensityMultiplier * hdr).ToString();
+                zValueTextBox.Text = (vector.z * intensityMultiplier * hdr).ToString();
             }
             catch
             {
@@ -163,6 +169,7 @@ namespace FrostyColorPicker.Windows
                 wValueTextBox.Text = vector.w.ToString();
 
             // Enables HDR calculation if value is > 1.
+            /*
             if (vector.x > 1 || vector.y > 1 || vector.z > 1)
             {
                 calculateHdrCheckbox.IsChecked = true;
@@ -170,18 +177,15 @@ namespace FrostyColorPicker.Windows
                 // With HDR calculation being enabled, we need to grab the largest of the three values in the vector and divide them all by it.
                 hdrDivisor = getHighestVec3Value(vector.x, vector.y, vector.z);
             }
+            */
 
             // Checks for output type
             if (outputTypeComboBox.SelectedIndex == 0) // Simple Linear
             {
-                // Check if we should calculate with HDR
-                if (calculateHdrCheckbox.IsChecked == true)
-                {
-                    // Divide by HDR divisor.
-                    vector.x /= hdrDivisor;
-                    vector.y /= hdrDivisor;
-                    vector.z /= hdrDivisor;
-                }
+                // Divide by HDR divisor.
+                vector.x /= hdr;
+                vector.y /= hdr;
+                vector.z /= hdr;
 
                 // Update color picker controls.
                 updateSquarePickerSimple(vector.x, vector.y, vector.z);
@@ -191,9 +195,9 @@ namespace FrostyColorPicker.Windows
                 // Check if we should calculate with HDR.
                 if (calculateHdrCheckbox.IsChecked == true)
                 {
-                    vector.x /= hdrDivisor;
-                    vector.y /= hdrDivisor;
-                    vector.z /= hdrDivisor;
+                    vector.x /= hdr;
+                    vector.y /= hdr;
+                    vector.z /= hdr;
                 }
 
                 // Update color picker controls.
@@ -233,21 +237,19 @@ namespace FrostyColorPicker.Windows
             }
         }
 
+
+        // TODO | This is not a good way of handling the color changed events. Doing all of this ends up making the square picker and sliders a bit laggy.
+        // Find a way to update the Vec3 values without sacrificing performance of the the two controls.
         private void SquarePicker_ColorChanged(object sender, RoutedEventArgs e)
         {
             // Try to stop recursion.
-            if (dontUpdateControls)
-                return;
+            //if (dontUpdateControls)
+                //return;
 
             dontUpdateControls = true;
 
             // Set other control colors to the current color of this one.
             hexColorTextBox.SelectedColor = squarePicker.SelectedColor;
-            colorSliders.SelectedColor = squarePicker.SelectedColor;
-
-            // Creates a brush to change the color of the color preview frame.
-            var newBrush = new SolidColorBrush(squarePicker.SelectedColor);
-            colorPreviewFrame.Background = newBrush;
 
             // Update Vec3 values.
             if (convert)
@@ -257,42 +259,21 @@ namespace FrostyColorPicker.Windows
 
         private void colorSliders_ColorChanged(object sender, RoutedEventArgs e)
         {
-            // Try to stop recursion.
-            if (dontUpdateControls)
-                return;
 
-            dontUpdateControls = true;
-            // Set other control colors to the current color of this one.
-            squarePicker.SelectedColor = colorSliders.SelectedColor;
-            hexColorTextBox.SelectedColor = colorSliders.SelectedColor;
-
-            // Creates a brush to change the color of the color preview frame.
-            var newBrush = new SolidColorBrush(squarePicker.SelectedColor);
-            colorPreviewFrame.Background = newBrush;
-
-            // Update Vec3 values.
-            convertSrgbToVec3();
-            dontUpdateControls = false;
         }
 
         private void hexColorTextBox_ColorChanged(object sender, RoutedEventArgs e)
         {
-            // Try to stop recursion.
-            if (dontUpdateControls)
-                return;
-
-            dontUpdateControls = true;
             // Set other control colors to the current color of this one.
-            squarePicker.SelectedColor = hexColorTextBox.SelectedColor;
-            colorSliders.SelectedColor = hexColorTextBox.SelectedColor;
+            if (!dontUpdateControls)
+            {
+                squarePicker.SelectedColor = hexColorTextBox.SelectedColor;
+                colorSliders.SelectedColor = hexColorTextBox.SelectedColor;
+            }
 
             // Creates a brush to change the color of the color preview frame.
-            var newBrush = new SolidColorBrush(squarePicker.SelectedColor);
-            colorPreviewFrame.Background = newBrush;
-
-            // Update Vec3 values.
-            convertSrgbToVec3();
-            dontUpdateControls = false;
+            currentColor = new SolidColorBrush(squarePicker.SelectedColor);
+            colorPreviewFrame.Background = currentColor;
         }
         #endregion
 
@@ -341,6 +322,10 @@ namespace FrostyColorPicker.Windows
                 if (useIntensityMultiplierCheckBox.IsChecked == true)
                     intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
 
+                float hdr = 1;
+                if (calculateHdrCheckbox.IsChecked == true)
+                    hdr = 1.5f;
+
                 float x = 0, y = 0, z = 0, w = 0;
 
                 // Checks for output type to accurately convert colors for their proper use case.
@@ -359,14 +344,9 @@ namespace FrostyColorPicker.Windows
                     w = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.A.ToString()) / 255);
                 }
 
-                if (calculateHdrCheckbox.IsChecked == true)
-                {
-                    // I have no idea what I'm doing :/
-                    //float hdrMultiplier = getHighestVec3Value(x, y, z);
-                    x *= 1.5f;
-                    y *= 1.5f;
-                    z *= 1.5f;
-                }
+                x *= hdr;
+                y *= hdr;
+                z *= hdr;
 
                 // Convert vector values to string for usage in the text boxes.
                 xValueTextBox.Text = x.ToString();
@@ -400,13 +380,11 @@ namespace FrostyColorPicker.Windows
                 return;
             }
 
-            float hdrDivisor = getHighestVec3Value(x, y, z);
-
             if (calculateHdrCheckbox.IsChecked == true)
             {
-                x /= hdrDivisor;
-                y /= hdrDivisor;
-                z /= hdrDivisor;
+                x /= 1.5f;
+                y /= 1.5f;
+                z /= 1.5f;
             }
 
             if (outputTypeComboBox.SelectedIndex == 0)
