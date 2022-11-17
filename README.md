@@ -4,7 +4,7 @@ A [Frosty Editor](https://github.com/CadeEvs/FrostyToolsuite) plugin for convert
 ![Plugin Preview](https://github.com/NatalieWhatever/FrostyColorPicker/blob/master/Resources/plugin-preview.png)
 
 ## Installation
-Download the latest release and extract the zip file. Move *all* of the DLL files in to the Plugins folder in your FrostyEditor directory.
+Download the [latest release](https://github.com/NatalieWhatever/FrostyColorPicker/releases/latest) and extract the zip file. Move *all* of the DLL files in to the Plugins folder in your FrostyEditor directory.
 
 ## Limitations
 * Vectors with high values are currently not supported as I don't know how to properly work with them.
