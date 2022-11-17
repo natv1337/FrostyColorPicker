@@ -1,6 +1,10 @@
 # FrostyColorPicker
 A [FrostyEditor](https://github.com/CadeEvs/FrostyToolsuite) plugin for converting Vector colors to and from other color methods. Works on versions 1.0.6.1 and higher.
 
+## Limitations
+* Vectors with high values are currently not supported as I don't know how to properly work with them.
+* HDR calculation has only been tested with one game and might not translate over to most games.
+
 ## Compiling
 1) Download the code or clone this repository.
 2) Open the .sln or .csproj and add the missing assemblies.
