@@ -120,7 +120,9 @@ namespace FrostyColorPicker.Windows
 
             // Intensity multiplier for the certain assets that benefit from it.
             float intensityMultiplier = 1;
-            if (useIntensityMultiplierCheckBox.IsChecked == true) // Use the user-defined intensity multiplier if the box is checked.
+
+                                                              // Shitty hotfix to prevent values from re-multiplying themselves through intensity that probably might not work properly.
+            if (useIntensityMultiplierCheckBox.IsChecked == true && vector.x / 1.5 < 1 && vector.y / 1.5 < 1 && vector.z / 1.5 < 1) // Use the user-defined intensity multiplier if the box is checked.
                 intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
 
             // try-catch here to ensure that vector is actually is actually a Vec3/Vec4.
@@ -274,14 +276,14 @@ namespace FrostyColorPicker.Windows
                     x = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.R.ToString()) * intensityMultiplier);
                     y = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.G.ToString()) * intensityMultiplier);
                     z = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.B.ToString()) * intensityMultiplier);
-                    w = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.A.ToString()));
+                    w = srgbChannelToLinearSimple(float.Parse(squarePicker.SelectedColor.A.ToString())) * intensityMultiplier;
                 }
                 else if (outputTypeComboBox.SelectedIndex == 1) // For sRGB Linear.
                 {
                     x = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.R.ToString()) / 255 * intensityMultiplier);
                     y = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.G.ToString()) / 255 * intensityMultiplier);
                     z = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.B.ToString()) / 255 * intensityMultiplier);
-                    w = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.A.ToString()) / 255);
+                    w = srgbChannelToLinear(float.Parse(squarePicker.SelectedColor.A.ToString()) / 255 * intensityMultiplier);
                 }
 
                 x *= hdr;
@@ -346,7 +348,11 @@ namespace FrostyColorPicker.Windows
             try
             {
                 convert = false;
-                squarePicker.SelectedColor = Color.FromArgb(byte.Parse(w.ToString()), byte.Parse(x.ToString()), byte.Parse(y.ToString()), byte.Parse(z.ToString())); // This shouldn't be calling the other functions, but it works :p
+
+                if (vector4ToggleCheckbox.IsChecked == true)
+                    squarePicker.SelectedColor = Color.FromArgb(byte.Parse(w.ToString()), byte.Parse(x.ToString()), byte.Parse(y.ToString()), byte.Parse(z.ToString()));
+                else
+                    squarePicker.SelectedColor = Color.FromArgb(255, byte.Parse(x.ToString()), byte.Parse(y.ToString()), byte.Parse(z.ToString()));
             }
             catch
             {
