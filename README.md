@@ -1,6 +1,8 @@
 # FrostyColorPicker
 A [FrostyEditor](https://github.com/CadeEvs/FrostyToolsuite) plugin for converting Vector colors to and from other color methods. Works on versions 1.0.6.1 and higher.
 
+![Plugin Preview](https://github.com/NatalieWhatever/FrostyColorPicker/blob/master/Resources/plugin-preview.png)
+
 ## Installation
 Download the latest release and extract the zip file. Move *all* of the DLL files in to the Plugins folder in your FrostyEditor directory.
 
