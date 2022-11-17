@@ -56,7 +56,7 @@
                         <Frame x:Name="colorPreviewFrame" Background="White" Grid.Column="2" Margin="0, 3, 0, 3"/>
                     </Grid>
 
-                    <colorpicker:ColorSliders x:Name="colorSliders"  Grid.Row="3" ColorChanged="colorSliders_ColorChanged" />
+                    <colorpicker:ColorSliders x:Name="colorSliders"  Grid.Row="3" />
                     
                     <!-- Intensity Multiplier -->
                     <CheckBox x:Name="useIntensityMultiplierCheckBox" Margin="5, 0, 0, 2" Foreground="White" ToolTip="Multiplies the Vec3 output by a desired amount." Grid.Row="4" Checked="useIntensityMultiplierCheckBox_Checked" Unchecked="useIntensityMultiplierCheckBox_Unchecked">
