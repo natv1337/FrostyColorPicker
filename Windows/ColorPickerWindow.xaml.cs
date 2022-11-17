@@ -144,10 +144,12 @@ namespace FrostyColorPicker.Windows
             vector.y /= hdr;
             vector.z /= hdr;
 
+            convert = false;
             if (outputTypeComboBox.SelectedIndex == 0) // Simple Linear
                 updateSquarePickerSimple(vector.x, vector.y, vector.z); // Update color picker controls with simple linear values.
             else if (outputTypeComboBox.SelectedIndex == 1) // Linear
                 updateSquarePickerLinear(vector.x, vector.y, vector.z); // Update color picker controls with linear values.
+            convert = true;
         }
 
         // Exports the current Vector3 values to the FrostyClipboard so that they can be pasted directly into fields.
