@@ -1,5 +1,4 @@
-﻿using System;
-using Frosty.Core;
+﻿using Frosty.Core;
 using FrostyColorPicker.Windows;
 
 namespace FrostyColorPicker
@@ -8,7 +7,7 @@ namespace FrostyColorPicker
     {
         public override string TopLevelMenuName => "Tools";
         public override string MenuItemName => "Color Menu";
-        public override RelayCommand MenuItemClicked => new RelayCommand((Action<object>)delegate
+        public override RelayCommand MenuItemClicked => new RelayCommand(delegate
         {
             ColorPickerWindow colorPickerWindow = new ColorPickerWindow();
             colorPickerWindow.Show();
