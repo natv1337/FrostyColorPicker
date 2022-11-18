@@ -95,7 +95,11 @@ namespace FrostyColorPicker.Windows
             ConvertSrgbToVec3();
         }
 
-        // Imports Vec3 FrostyClipboard data into the window.
+        /// <summary>
+        /// Imports Vec3 FrostyClipboard data into the window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ImportValuefromClipboardButton_Click(object sender, RoutedEventArgs e)
         {
             // Checks if clipboard data exists (Needed bc it crashes if you don't have any).
@@ -155,7 +159,11 @@ namespace FrostyColorPicker.Windows
             _convert = true;
         }
 
-        // Exports the current Vector3 values to the FrostyClipboard so that they can be pasted directly into fields.
+        /// <summary>
+        /// Exports the current Vector3 values to the FrostyClipboard so that they can be pasted directly into fields.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExportValueToClipboardButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -186,7 +194,6 @@ namespace FrostyColorPicker.Windows
                 FrostyMessageBox.Show("One of your vector values are invalid (they should be floating-point numbers).", "Clipboard Error");
             }
         }
-
 
         // TODO | This is not a good way of handling the color changed events. Doing all of this ends up making the square picker and sliders a bit laggy.
         // Find a way to update the Vec3 values without sacrificing performance of the the two controls.
@@ -223,7 +230,11 @@ namespace FrostyColorPicker.Windows
 
         // TODO: Look into updating to .NET 6.0 to use MathF.Pow
 
-        // Convert sRGB linear float to sRGB channel float.
+        /// <summary>
+        /// Convert sRGB linear float to sRGB channel float.
+        /// </summary>
+        /// <param name="linear"></param>
+        /// <returns></returns>
         public float LinearFloatToSrgbChannel(float linear)
         {
             if (linear <= 0.0031308)
@@ -232,7 +243,11 @@ namespace FrostyColorPicker.Windows
             return (float)(Math.Pow(linear, 0.41667) * 1.055) - 0.055f;
         }
 
-        // Convert sRGB channel float into sRGB linear float.
+        /// <summary>
+        /// Convert sRGB channel float into sRGB linear float.
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
         public float SrgbChannelToLinear(float channel)
         {
             if (channel > 0.04045)
@@ -241,13 +256,21 @@ namespace FrostyColorPicker.Windows
             return channel / 12.92f;
         }
 
-        // Convert sRGB channel float to a simple value.
+        /// <summary>
+        /// Convert sRGB channel float to a simple value.
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
         public float SrgbChannelToLinearSimple(float channel)
         {
             return channel / 255.0f;
         }
 
-        // Convert a simple value to an sRGB channel.
+        /// <summary>
+        /// Convert a simple value to an sRGB channel.
+        /// </summary>
+        /// <param name="simple"></param>
+        /// <returns></returns>
         public float LinearSimpleFloatToSrgbChannel(float simple)
         {
             return simple * 255.0f;
@@ -257,7 +280,9 @@ namespace FrostyColorPicker.Windows
 
         #region Misc. Methods
 
-        // Re-calculate Vec3 values.
+        /// <summary>
+        /// Re-calculate Vec3 values.
+        /// </summary>
         public void ConvertSrgbToVec3()
         {
             if (IsLoaded)
@@ -301,7 +326,9 @@ namespace FrostyColorPicker.Windows
             }
         }
 
-        // Re-calculate srgb channel values.
+        /// <summary>
+        /// Re-calculate srgb channel values.
+        /// </summary>
         public void ConvertVectorToSrgb()
         {
             float intensityMultiplier = 1;
@@ -361,7 +388,12 @@ namespace FrostyColorPicker.Windows
             _convert = true;
         }
 
-        // Update color picker controls based on linear srgb channels.
+        /// <summary>
+        /// Update color picker controls based on linear srgb channels.
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        /// <param name="vecZ"></param>
         public void UpdateSquarePickerLinear(float vecX, float vecY, float vecZ)
         {
             string red = (Math.Round(LinearFloatToSrgbChannel(vecX) * 255f)).ToString();
@@ -378,7 +410,12 @@ namespace FrostyColorPicker.Windows
             }
         }
 
-        // Update square picker controls based on simple linear srgb channels.
+        /// <summary>
+        /// Update square picker controls based on simple linear srgb channels.
+        /// </summary>
+        /// <param name="vecX"></param>
+        /// <param name="vecY"></param>
+        /// <param name="vecZ"></param>
         public void UpdateSquarePickerSimple(float vecX, float vecY, float vecZ)
         {
             string red = (Math.Round(LinearSimpleFloatToSrgbChannel(vecX))).ToString();
