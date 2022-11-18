@@ -257,7 +257,7 @@ namespace FrostyColorPicker.Windows
         // Re-calculate Vec3 values.
         public void convertSrgbToVec3()
         {
-            try // Random crash if this try-catch doesn't exist. Is the color picker trying to call it before it loads??
+            if(IsLoaded)
             {
                 // Another check for seeing whether or not to use a user-defined intensity multiplier.
                 float intensityMultiplier = 1;
@@ -295,10 +295,6 @@ namespace FrostyColorPicker.Windows
                 yValueTextBox.Text = y.ToString();
                 zValueTextBox.Text = z.ToString();
                 wValueTextBox.Text = w.ToString();
-            }
-            catch
-            {
-                // Empty catch statement :\
             }
         }
 
