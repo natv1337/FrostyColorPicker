@@ -52,20 +52,20 @@
                             <ColumnDefinition Width="64" /> <!-- colorPreviewFrame -->
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <colorpicker:HexColorTextBox x:Name="hexColorTextBox" Grid.Column="1" ColorChanged="hexColorTextBox_ColorChanged"/>
+                        <colorpicker:HexColorTextBox x:Name="hexColorTextBox" Grid.Column="1" ColorChanged="HexColorTextBox_ColorChanged"/>
                         <Frame x:Name="colorPreviewFrame" Background="White" Grid.Column="2" Margin="0, 3, 0, 3"/>
                     </Grid>
 
                     <colorpicker:ColorSliders x:Name="colorSliders"  Grid.Row="3" />
                     
                     <!-- Intensity Multiplier -->
-                    <CheckBox x:Name="useIntensityMultiplierCheckBox" Margin="5, 0, 0, 2" Foreground="White" ToolTip="Multiplies the Vec3 output by a desired amount." Grid.Row="4" Checked="useIntensityMultiplierCheckBox_Checked" Unchecked="useIntensityMultiplierCheckBox_Unchecked">
+                    <CheckBox x:Name="useIntensityMultiplierCheckBox" Margin="5, 0, 0, 2" Foreground="White" ToolTip="Multiplies the Vec3 output by a desired amount." Grid.Row="4" Checked="UseIntensityMultiplierCheckBox_Checked" Unchecked="UseIntensityMultiplierCheckBox_Unchecked">
                         <TextBlock Text=" Use Intensity Multiplier" Foreground="White" />
                     </CheckBox>
-                    <TextBox x:Name="intensityMultiplierBox" Text="1.0" IsEnabled="False" FontSize="14" Margin="5, 0, 5, 0" BorderThickness="1" Grid.Row="5" TextChanged="intensityMultiplierBox_TextChanged" />
+                    <TextBox x:Name="intensityMultiplierBox" Text="1.0" IsEnabled="False" FontSize="14" Margin="5, 0, 5, 0" BorderThickness="1" Grid.Row="5" TextChanged="IntensityMultiplierBox_TextChanged" />
                 </Grid>
             </ctrl:FrostyDockablePanel>
-            <Button x:Name="importValuefromClipboardButton" Foreground="White" ToolTip="Imports Vec3 data copied to the clipboard." Content="Import from Clipboard" Margin="0, 10, 0, 10" Grid.Row="1" Click="importValuefromClipboardButton_Click" />
+            <Button x:Name="importValuefromClipboardButton" Foreground="White" ToolTip="Imports Vec3 data copied to the clipboard." Content="Import from Clipboard" Margin="0, 10, 0, 10" Grid.Row="1" Click="ImportValuefromClipboardButton_Click" />
         </Grid>
         
         <!-- Vector 3 Input/Output -->
@@ -96,41 +96,41 @@
                     <!-- Output Type -->
                     <Label Content="Conversion Type" Grid.Row="0" />
                     
-                    <ComboBox x:Name="outputTypeComboBox" Grid.Row="1" SelectedIndex="0" SelectionChanged="outputTypeComboBox_SelectionChanged">
+                    <ComboBox x:Name="outputTypeComboBox" Grid.Row="1" SelectedIndex="0" SelectionChanged="OutputTypeComboBox_SelectionChanged">
                         <ComboBoxItem>Simple Linear</ComboBoxItem>
                         <ComboBoxItem>Linear</ComboBoxItem>
                     </ComboBox>
 
                     <!-- X -->
                     <Label Content="X" Grid.Row="2" />
-                    <TextBox x:Name="xValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="3" TextChanged="xValueTextBox_TextChanged" />
+                    <TextBox x:Name="xValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="3" TextChanged="XValueTextBox_TextChanged" />
 
                     <!-- Y -->
                     <Label Content="Y" Grid.Row="4" />
-                    <TextBox x:Name="yValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="5" TextChanged="yValueTextBox_TextChanged" />
+                    <TextBox x:Name="yValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="5" TextChanged="YValueTextBox_TextChanged" />
 
                     <!-- Z -->
                     <Label Content="Z" Grid.Row="6" />
-                    <TextBox x:Name="zValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="7" TextChanged="zValueTextBox_TextChanged" />
+                    <TextBox x:Name="zValueTextBox" Text="0" FontSize="14" Margin="1" BorderThickness="1" Grid.Row="7" TextChanged="ZValueTextBox_TextChanged" />
 
                     <!-- W -->
                     <Label Content="W" Grid.Row="8" />
-                    <TextBox x:Name="wValueTextBox" Text="0" FontSize="14" IsEnabled="False" Margin="1" BorderThickness="1" Grid.Row="9" TextChanged="wValueTextBox_TextChanged" />
+                    <TextBox x:Name="wValueTextBox" Text="0" FontSize="14" IsEnabled="False" Margin="1" BorderThickness="1" Grid.Row="9" TextChanged="WValueTextBox_TextChanged" />
 
                     <!-- Vector4 Toggle -->
-                    <CheckBox x:Name="vector4ToggleCheckbox" Foreground="White" Grid.Row="11" Margin="0, 0, 0, 2" Checked="vector4ToggleCheckbox_Checked" Unchecked="vector4ToggleCheckbox_Unchecked">
+                    <CheckBox x:Name="vector4ToggleCheckbox" Foreground="White" Grid.Row="11" Margin="0, 0, 0, 2" Checked="Vector4ToggleCheckbox_Checked" Unchecked="Vector4ToggleCheckbox_Unchecked">
                         <TextBlock Text=" Vector4" Foreground="White" />
                     </CheckBox>
                     
                     <!-- Intensity Multiplier -->
-                    <CheckBox x:Name="calculateHdrCheckbox" Foreground="White" ToolTip="Automatically calculates HDR into the Vector3 output." Grid.Row="12" Checked="calculateHdrCheckbox_Checked" Unchecked="calculateHdrCheckbox_Unchecked">
+                    <CheckBox x:Name="calculateHdrCheckbox" Foreground="White" ToolTip="Automatically calculates HDR into the Vector3 output." Grid.Row="12" Checked="CalculateHdrCheckbox_Checked" Unchecked="CalculateHdrCheckbox_Unchecked">
                         <TextBlock Text=" Calculate HDR" Foreground="White" />
                     </CheckBox>
 
                 </Grid>
             </ctrl:FrostyDockablePanel>
 
-            <Button x:Name="exportValueToClipboardButton" Foreground="White" ToolTip="Exports Vec3 data to the clipboard." Content="Export to Clipboard" Margin="0, 10, 0, 10" Grid.Row="1" Click="exportValueToClipboardButton_Click" />
+            <Button x:Name="exportValueToClipboardButton" Foreground="White" ToolTip="Exports Vec3 data to the clipboard." Content="Export to Clipboard" Margin="0, 10, 0, 10" Grid.Row="1" Click="ExportValueToClipboardButton_Click" />
         </Grid>
     </Grid>
 
