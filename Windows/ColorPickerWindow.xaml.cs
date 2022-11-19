@@ -102,46 +102,40 @@ namespace FrostyColorPicker.Windows
         /// <param name="e"></param>
         private void ImportValuefromClipboardButton_Click(object sender, RoutedEventArgs e)
         {
-            // Checks if clipboard data exists (Needed bc it crashes if you don't have any).
-            if (!FrostyClipboard.Current.HasData)
+            // Ensure that clipboard contains data and type is either Vec3 or Vec4 type.
+            if(!FrostyClipboard.Current.HasData)
+            {
+                FrostyMessageBox.Show("Clipboard does not contain data!", "Error", MessageBoxButton.OK);
                 return;
+            }
 
-            object obj = FrostyClipboard.Current.GetData();
-
-            // Try to get either a Vec3 or Vec4 out of the clipboard data.
-            dynamic vector;
-            if (vector4ToggleCheckbox.IsChecked == true)
-                vector = TypeLibrary.CreateObject("Vec4"); // Sets vector to Frosty's Vec4 class
-            else
-                vector = TypeLibrary.CreateObject("Vec3"); // Sets vector to Vec3 class
-
-            vector = obj; // Moves clipboard data into the vector.
-
-            float hdr = 1;
-            //if (vector.x > 1 || vector.y > 1 || vector.z > 1)
-            //calculateHdrCheckbox.IsChecked = true;
-            if (calculateHdrCheckbox.IsChecked == true)
-                hdr = 1.5f;
+            if (!(FrostyClipboard.Current.IsType(TypeLibrary.GetType("Vec3")) || FrostyClipboard.Current.IsType(TypeLibrary.GetType("Vec4"))))
+            {
+                FrostyMessageBox.Show("Clipboard data is not of type Vec3 or Vec4!", "Error", MessageBoxButton.OK);
+                return;
+            }
 
             // Intensity multiplier for the certain assets that benefit from it.
-            float intensityMultiplier = 1;
+
+            float hdr = calculateHdrCheckbox.IsChecked == true ? 1.5f : 1.0f;
+            float intensityMultiplier = 1.0f;
+
+            dynamic vector = FrostyClipboard.Current.GetData();
 
             // Shitty hotfix to prevent values from re-multiplying themselves through intensity that probably might not work properly.
-            if (useIntensityMultiplierCheckBox.IsChecked == true && vector.x / 1.5 < 1 && vector.y / 1.5 < 1 && vector.z / 1.5 < 1) // Use the user-defined intensity multiplier if the box is checked.
-                intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
+            if (useIntensityMultiplierCheckBox.IsChecked == true && vector.x / 1.5f < 1 && vector.y / 1.5f < 1 && vector.z / 1.5f < 1) // Use the user-defined intensity multiplier if the box is checked.
+            {
+                // Note
+                // Using float.TryParse will not throw an exception (and therefore crash the editor) on invalid input.
+                // It should also be faster because its implementation does not use exceptions.
+                if (float.TryParse(intensityMultiplierBox.Text, out intensityMultiplier))
+                    FrostyMessageBox.Show("Invalid intensity multiplier! (A valid float value is required)", "Error", MessageBoxButton.OK);
+            }
 
-            // try-catch here to ensure that vector is actually is actually a Vec3/Vec4.
-            try
-            {
-                xValueTextBox.Text = (vector.x * intensityMultiplier * hdr).ToString();
-                yValueTextBox.Text = (vector.y * intensityMultiplier * hdr).ToString();
-                zValueTextBox.Text = (vector.z * intensityMultiplier * hdr).ToString();
-            }
-            catch
-            {
-                FrostyMessageBox.Show("Clipboard data is not of type Vec3 or Vec4.", "Clipboard Error");
-                return;
-            }
+            // Because of the entry clipboard data type check we are certain this is correct.  
+            xValueTextBox.Text = (vector.x * intensityMultiplier * hdr).ToString();
+            yValueTextBox.Text = (vector.y * intensityMultiplier * hdr).ToString();
+            zValueTextBox.Text = (vector.z * intensityMultiplier * hdr).ToString();
 
             // Import W value if it's a Vec4.
             if (vector4ToggleCheckbox.IsChecked == true)
@@ -152,10 +146,12 @@ namespace FrostyColorPicker.Windows
             vector.z /= hdr;
 
             _convert = false;
+
             if (outputTypeComboBox.SelectedIndex == 0) // Simple Linear
                 UpdateSquarePickerSimple(vector.x, vector.y, vector.z); // Update color picker controls with simple linear values.
             else if (outputTypeComboBox.SelectedIndex == 1) // Linear
                 UpdateSquarePickerLinear(vector.x, vector.y, vector.z); // Update color picker controls with linear values.
+            
             _convert = true;
         }
 
