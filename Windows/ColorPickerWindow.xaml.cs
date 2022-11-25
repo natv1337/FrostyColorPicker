@@ -276,6 +276,23 @@ namespace FrostyColorPicker.Windows
 
         #region Misc. Methods
 
+        private float GetIntensityMultiplierValue()
+        {
+            if (useIntensityMultiplierCheckBox.IsChecked == false)
+                return 1.0f;
+
+            if(!float.TryParse(intensityMultiplierBox.Text, out float multiplier))
+            {
+                FrostyMessageBox.Show("Invalid intensity multiplier!", "Error", MessageBoxButton.OK);
+                return 0.0f;
+            }
+
+            return multiplier;
+        }
+
+        private float GetHdrValue() => calculateHdrCheckbox.IsChecked == true ? 1.5f : 1.0f;
+
+
         /// <summary>
         /// Re-calculate Vec3 values.
         /// </summary>
@@ -283,14 +300,8 @@ namespace FrostyColorPicker.Windows
         {
             if (IsLoaded)
             {
-                // Another check for seeing whether or not to use a user-defined intensity multiplier.
-                float intensityMultiplier = 1;
-                if (useIntensityMultiplierCheckBox.IsChecked == true)
-                    intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
-
-                float hdr = 1;
-                if (calculateHdrCheckbox.IsChecked == true)
-                    hdr = 1.5f;
+                float intensityMultiplier = GetIntensityMultiplierValue();
+                float hdr = GetHdrValue();
 
                 float x = 0, y = 0, z = 0, w = 0;
 
@@ -327,21 +338,29 @@ namespace FrostyColorPicker.Windows
         /// </summary>
         public void ConvertVectorToSrgb()
         {
-            float intensityMultiplier = 1;
-            if (useIntensityMultiplierCheckBox.IsChecked == true)
-                intensityMultiplier = float.Parse(intensityMultiplierBox.Text);
+            float intensityMultiplier = GetIntensityMultiplierValue();
 
-            float x, y, z, w;
-            try
+            if (!float.TryParse(xValueTextBox.Text, out float x))
             {
-                x = float.Parse(xValueTextBox.Text);
-                y = float.Parse(yValueTextBox.Text);
-                z = float.Parse(zValueTextBox.Text);
-                w = float.Parse(wValueTextBox.Text);
+                FrostyMessageBox.Show("Invalid X value!", "Error", MessageBoxButton.OK);
+                return;
             }
-            catch
+
+            if(!float.TryParse(yValueTextBox.Text, out float y))
             {
-                // Conversion Error
+                FrostyMessageBox.Show("Invalid Y value!", "Error", MessageBoxButton.OK);
+                return;
+            }
+
+            if (!float.TryParse(zValueTextBox.Text, out float z))
+            {
+                FrostyMessageBox.Show("Invalid Z value!", "Error", MessageBoxButton.OK);
+                return;
+            }
+
+            if (!float.TryParse(wValueTextBox.Text, out float w))
+            {
+                FrostyMessageBox.Show("Invalid W value!", "Error", MessageBoxButton.OK);
                 return;
             }
 
